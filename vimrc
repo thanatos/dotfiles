@@ -8,10 +8,17 @@ set noexpandtab
 set smartindent
 " Highlight search
 set hlsearch
+" Syntax highlighting
+syntax enable
 
 
 " Colorsheme
-colorscheme darkspectrum
+if has("gui")
+	colorscheme darkspectrum
+else
+	colorscheme delek
+endif
+
 
 " GUI settings
 if has("gui")
