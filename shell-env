@@ -1,0 +1,8 @@
+# Add custom tools to $PATH:
+PATH="$PATH:$HOME/Apps/bin"
+
+# vim is the One True Editor:
+EDITOR=vim
+
+# less is more:
+PAGER=less
