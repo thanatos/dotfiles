@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+cd "$HOME"
+mkdir -p code
+cd code
+
+if [[ -e dotfiles ]];
+	echo "dotfiles appears to exist. Aborting." >&2
+	exit 1
+fi
+
+mkdir -p dotfiles
+cd dotfiles
+
+git clone --origin github https://github.com/thanatos/dotfiles.git
