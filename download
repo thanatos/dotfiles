@@ -6,7 +6,7 @@ cd "$HOME"
 mkdir -p code
 cd code
 
-if [[ -e dotfiles ]];
+if [[ -e dotfiles ]]; then
 	echo "dotfiles appears to exist. Aborting." >&2
 	exit 1
 fi
@@ -14,4 +14,4 @@ fi
 mkdir -p dotfiles
 cd dotfiles
 
-git clone --origin github https://github.com/thanatos/dotfiles.git
+git clone --origin github https://github.com/thanatos/dotfiles.git .
