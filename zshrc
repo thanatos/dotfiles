@@ -24,6 +24,9 @@ source "$DOTFILES"/shell/env
 
 
 # Prompt:
+# For more awesome prompts:
+setopt PROMPT_SUBST
+
 function _prompt_minimalist() {
 	PS1="%B%#%b "
 }
