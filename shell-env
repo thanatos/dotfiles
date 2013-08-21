@@ -6,3 +6,7 @@ EDITOR=vim
 
 # less is more:
 PAGER=less
+
+# Always color:
+alias ls="ls --color"
+alias grep="grep --color"
