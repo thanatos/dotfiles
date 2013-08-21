@@ -1,0 +1,28 @@
+# A multiline zsh prompt.
+
+function _prompt_alpha_get_location() {
+	local GIT_ROOT="`_git_root`"
+
+	if [[ -n "$GIT_ROOT" ]]; then
+		local GIT_BRANCH
+		GIT_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+		if [[ $? != 0 ]]; then
+			GIT_BRANCH="%B%F{red}detached head%f%b"
+		fi
+
+		local GIT_PWD="$(git rev-parse --show-prefix)"
+		if [[ "${GIT_PWD: -1}" == "/" ]] then
+			GIT_PWD="${GIT_PWD:0:-1}"
+		fi
+		echo "%F{green}±%f %B$(basename "${GIT_ROOT}")%b:%F{green}${GIT_BRANCH}%f:%B%F{blue}/${GIT_PWD}%f%b"
+	else
+		echo '%B%F{blue}%d%f%b'
+	fi
+}
+
+function _prompt_alpha() {
+	local LAST_EXIT="$?"
+	PS1='$(_prompt_alpha_get_location)
+%(?||%B%F{red}(last command returned %?.%)%f%b
+)%# '
+}

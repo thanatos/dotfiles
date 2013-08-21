@@ -23,6 +23,11 @@ SAVEHIST=5000
 source "$DOTFILES"/shell/env
 
 
+# Source other stuff:
+source "$DOTFILES"/shell/zsh/git
+source "$DOTFILES"/shell/zsh/prompt-alpha
+
+
 # Prompt:
 # For more awesome prompts:
 setopt PROMPT_SUBST
@@ -35,4 +40,4 @@ function _prompt_bash_like() {
 	PS1="%B%F{green}%n@%m%f %F{blue%~ %#%f%b "
 }
 
-_prompt_bash_like
+_prompt_alpha
