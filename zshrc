@@ -20,7 +20,7 @@ SAVEHIST=5000
 
 
 # Source environment variables:
-source "$DOTFILES"/shell-env
+source "$DOTFILES"/shell/env
 
 
 # Prompt:

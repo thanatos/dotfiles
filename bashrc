@@ -1,8 +1,8 @@
 # Use emacs keybindings.
 set -o emacs
 
-source "$DOTFILES"/shell-env
-source "$DOTFILES"/shell-prompt-common
+source "$DOTFILES"/shell/env
+source "$DOTFILES"/shell/prompt-common
 
 
 function _prompt_default() {
