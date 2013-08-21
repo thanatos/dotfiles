@@ -1,0 +1,25 @@
+# vim: filetype=sh
+
+# NOTE: This file is a bash/zsh polyglot. Careful with syntax.
+
+function _prompt_is_zsh() {
+	[[ -n "$ZSH_VERSION" ]]
+}
+
+function _prompt_hostname() {
+	if _prompt_is_zsh; then
+		echo "$HOST"
+	else
+		echo "$HOSTNAME"
+	fi
+}
+
+function _prompt_short_host() {
+	if [[ -n "$SSH_CONNECTION" ]]; then
+		_prompt_hostname
+	fi
+}
+
+function _prompt_is_root() {
+	[[ "$UID" == 0 ]]
+}
