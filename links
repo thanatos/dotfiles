@@ -2,3 +2,13 @@
     type: symlink
     path: '.vimrc'
     destination: vimrc
+
+".bashrc":
+    type: shell-insertion
+    file: '.bashrc'
+    file-to-source: bashrc
+
+".zshrc":
+    type: shell-insertion
+    file: '.zshrc'
+    file-to-source: zshrc

@@ -54,12 +54,44 @@ class Symlink(object):
         return True
 
 
+_SHELL_INSERT = '''\
+### (begin dotfiles managed section) ###
+DOTFILES='{dotfiles}'
+source "$DOTFILES"/'{source}'
+### (  end dotfiles managed section) ###
+'''
+
+
 class ShellInsertion(object):
     def __init__(self, yaml_data):
-        pass
+        self.file_to_source = yaml_data['file-to-source']
+        self.rcfile = yaml_data['file']
+
+    def _get_insertion(self):
+        dotfiles_loc = dotfiles_location()
+        return _SHELL_INSERT.format(
+            dotfiles=dotfiles_loc,
+            source=self.file_to_source)
+
+    def _rcfile(self):
+        return os.path.join(home(), self.rcfile)
 
     def check(self):
-       return False
+        with open(self._rcfile(), 'r') as fh:
+            data = fh.read()
+        return self._get_insertion() in data
+
+    def install(self):
+        if self.check():
+            sys.stderr.write(
+                '{term.BOLD}{term.RED}Link already installed.{term.RESET}'
+                '\n'.format(term=term))
+            sys.exit(1)
+
+        with open(self._rcfile(), 'a') as fh:
+            fh.write(self._get_insertion())
+
+        return True
 
 
 link_types = {
