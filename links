@@ -1,0 +1,4 @@
+".vimrc":
+    type: symlink
+    path: '.vimrc'
+    destination: vimrc

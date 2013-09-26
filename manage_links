@@ -1,0 +1,198 @@
+#!/usr/bin/env python
+
+
+import errno
+import os
+import os.path
+import sys
+
+import yaml
+
+
+def dotfiles_location():
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+sys.path.append(os.path.join(dotfiles_location(), 'manage'))
+import term
+
+
+class Symlink(object):
+    def __init__(self, yaml_data):
+        self.path = yaml_data['path']
+        self.destination = yaml_data['destination']
+
+    def check(self):
+        full_path = os.path.join(home(), self.path)
+        try:
+            linked_to = os.readlink(full_path)
+        except OSError as ose:
+            if ose.errno in (errno.ENOENT, errno.EINVAL):
+                return False
+            else:
+                raise
+
+        full_destination = os.path.join(dotfiles_location(), self.destination)
+        linked_to = os.path.normpath(linked_to)
+
+        installed = (linked_to == full_destination)
+        return installed
+
+    def install(self):
+        full_path = os.path.join(home(), self.path)
+        if os.path.exists(full_path):
+            response = yes_no_question(
+                'The path “{}” already exists, overwrite?'.format(full_path))
+            if not response:
+                return False
+            else:
+                os.unlink(full_path)
+
+        full_destination = os.path.join(dotfiles_location(), self.destination)
+        os.symlink(full_destination, full_path)
+
+        return True
+
+
+class ShellInsertion(object):
+    def __init__(self, yaml_data):
+        pass
+
+    def check(self):
+       return False
+
+
+link_types = {
+    'symlink': Symlink,
+    'shell-insertion': ShellInsertion,
+}
+
+
+def yes_no_question(question):
+    while True:
+        sys.stdout.write(
+            '{bold}{q} [{green}Yes{nocolor}/{red}No{nocolor}]{reset} '.format(
+                q=question,
+                bold=term.BOLD, nocolor=term.NOCOLOR, reset=term.RESET,
+                green=term.GREEN, red=term.RED
+            )
+        )
+        sys.stdout.flush()
+        user_input = sys.stdin.readline()
+        processed_input = user_input.strip().lower()
+        if processed_input.lower() in ('y', 'yes'):
+            return True
+        elif processed_input.lower() in ('n', 'no'):
+            return False
+        elif not user_input:
+            raise IOError('Unexpected EOF in user input.')
+        else:
+            sys.stderr.write('“Yes” or “No” only, please.\n')
+
+
+def home():
+    return os.environ['HOME']
+
+
+def load_links():
+    with open('links', 'r') as f:
+        data = yaml.load(f)
+
+    links = {}
+    for name, value in data.items():
+        link_class = link_types.get(value.get('type'))
+        if link_class is None:
+            raise IOError('Unknown link type for link “{}”.'.format(name))
+        links[name] = link_class(value)
+
+    return links
+
+
+def list_links():
+    all_link_data = load_links()
+    
+    links = sorted(s for s in all_link_data)
+    sys.stdout.write('{bold}{green}Links:{reset}\n'.format(
+        bold=term.BOLD, green=term.GREEN, reset=term.RESET))
+    for idx, link_name in enumerate(links, 1):
+        link = all_link_data[link_name]
+        installed = link.check()
+
+        if installed:
+            status = '{green}(installed){reset}'
+        else:
+            status = '{bold}{red}(not installed){reset}'
+        status = status.format(
+            bold=term.BOLD, green=term.GREEN, red=term.RED, reset=term.RESET)
+        
+        sys.stdout.write('  {bold}[{}]{reset} {} {}\n'.format(
+            idx, link_name, status, bold=term.BOLD, reset=term.RESET))
+
+
+def install_link(link):
+    all_link_data = load_links()
+
+    link_number = None
+    try:
+        link_number = int(link, 10)
+    except ValueError:
+        pass
+    if link_number is not None:
+        link_number -= 1
+        links = sorted(s for s in all_link_data)
+        if link_number < 0:
+            abort_with_error('Link number too small.')
+        if len(links) <= link_number:
+            abort_with_error('Link number too large.')
+        link = links[link_number]
+    else:
+        if link not in all_link_data:
+            sys.stderr.write('{bold}{red}Unknown link “{}”.{reset}\n'.format(
+                link, bold=term.BOLD, red=term.RED, reset=term.RESET))
+            sys.exit(1)
+
+    sys.stdout.write('{bold}{green}Installing link “{}”…{reset}\n'.format(
+        link, bold=term.BOLD, reset=term.RESET, green=term.GREEN))
+
+    link_data = all_link_data[link]
+    result = link_data.install()
+
+    if result:
+        sys.stdout.write('{bold}{green}Link “{}” installed.{reset}\n'.format(
+            link, bold=term.BOLD, reset=term.RESET, green=term.GREEN))
+    else:
+        sys.stdout.write(
+            'Installation of link “{}” aborted.\n'.format(link))
+
+
+def abort_with_error(error):
+    sys.stderr.write(
+        '{bold}{red}Error:{reset} {}\n'.format(
+            error, bold=term.BOLD, reset=term.RESET, red=term.RED))
+    sys.exit(1)
+
+
+def main(argv):
+    if len(argv) < 2:
+        list_links()
+        return
+
+    command = argv[1]
+    if command == 'list':
+        if len(argv) != 2:
+            abort_with_error('Too many arguments for command “list”.')
+        list_links()
+    elif command == 'install':
+        if len(argv) < 3:
+            abort_with_error(
+                'Too few arguments for command “install”: need name or number'
+                ' of link to install.')
+        if 3 < len(argv):
+            abort_with_error('Too many arguments for command “install”.')
+        install_link(argv[2])
+    else:
+        abort_with_error('Unknown command “{}”.'.format(command))
+
+
+if __name__ == '__main__':
+    main(sys.argv)
