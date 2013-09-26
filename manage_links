@@ -83,10 +83,7 @@ class ShellInsertion(object):
 
     def install(self):
         if self.check():
-            sys.stderr.write(
-                '{term.BOLD}{term.RED}Link already installed.{term.RESET}'
-                '\n'.format(term=term))
-            sys.exit(1)
+            abort_with_error('Link already installed.')
 
         with open(self._rcfile(), 'a') as fh:
             fh.write(self._get_insertion())
@@ -179,9 +176,7 @@ def install_link(link):
         link = links[link_number]
     else:
         if link not in all_link_data:
-            sys.stderr.write('{bold}{red}Unknown link “{}”.{reset}\n'.format(
-                link, bold=term.BOLD, red=term.RED, reset=term.RESET))
-            sys.exit(1)
+            abort_with_error('Unknown link “link”.')
 
     sys.stdout.write('{bold}{green}Installing link “{}”…{reset}\n'.format(
         link, bold=term.BOLD, reset=term.RESET, green=term.GREEN))
