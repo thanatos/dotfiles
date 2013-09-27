@@ -8,13 +8,12 @@ import sys
 
 import yaml
 
+from manage import term
+from manage import util
+
 
 def dotfiles_location():
     return os.path.dirname(os.path.abspath(__file__))
-
-
-sys.path.append(os.path.join(dotfiles_location(), 'manage'))
-import term
 
 
 class Symlink(object):
@@ -83,7 +82,7 @@ class ShellInsertion(object):
 
     def install(self):
         if self.check():
-            abort_with_error('Link already installed.')
+            util.abort_with_error('Link already installed.')
 
         with open(self._rcfile(), 'a') as fh:
             fh.write(self._get_insertion())
@@ -170,13 +169,13 @@ def install_link(link):
         link_number -= 1
         links = sorted(s for s in all_link_data)
         if link_number < 0:
-            abort_with_error('Link number too small.')
+            util.abort_with_error('Link number too small.')
         if len(links) <= link_number:
-            abort_with_error('Link number too large.')
+            util.abort_with_error('Link number too large.')
         link = links[link_number]
     else:
         if link not in all_link_data:
-            abort_with_error('Unknown link “link”.')
+            util.abort_with_error('Unknown link “link”.')
 
     sys.stdout.write('{bold}{green}Installing link “{}”…{reset}\n'.format(
         link, bold=term.BOLD, reset=term.RESET, green=term.GREEN))
@@ -192,13 +191,6 @@ def install_link(link):
             'Installation of link “{}” aborted.\n'.format(link))
 
 
-def abort_with_error(error):
-    sys.stderr.write(
-        '{bold}{red}Error:{reset} {}\n'.format(
-            error, bold=term.BOLD, reset=term.RESET, red=term.RED))
-    sys.exit(1)
-
-
 def main(argv):
     if len(argv) < 2:
         list_links()
@@ -207,18 +199,18 @@ def main(argv):
     command = argv[1]
     if command == 'list':
         if len(argv) != 2:
-            abort_with_error('Too many arguments for command “list”.')
+            util.abort_with_error('Too many arguments for command “list”.')
         list_links()
     elif command == 'install':
         if len(argv) < 3:
-            abort_with_error(
+            util.abort_with_error(
                 'Too few arguments for command “install”: need name or number'
                 ' of link to install.')
         if 3 < len(argv):
-            abort_with_error('Too many arguments for command “install”.')
+            util.abort_with_error('Too many arguments for command “install”.')
         install_link(argv[2])
     else:
-        abort_with_error('Unknown command “{}”.'.format(command))
+        util.abort_with_error('Unknown command “{}”.'.format(command))
 
 
 if __name__ == '__main__':
