@@ -1,3 +1,9 @@
+# Completion settings:
+zstyle ':completion:*' completer _complete _approximate
+autoload -Uz compinit
+compinit
+
+
 # As vim user, I prefer emacs mode:
 bindkey -e
 # Home, end
@@ -6,11 +12,12 @@ bindkey -e '\eOF' end-of-line
 # Ctrl+left/right
 bindkey -e '\e[1;5D' backward-word
 bindkey -e '\e[1;5C' forward-word
-
-# Completion settings:
-zstyle ':completion:*' completer _complete _approximate
-autoload -Uz compinit
-compinit
+# Delete
+bindkey -e '\e[3~' delete-char
+# Edit line in $EDITOR:
+autoload edit-command-line
+zle -N edit-command-line
+bindkey -e '^Xe' edit-command-line
 
 
 # History settings:
