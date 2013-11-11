@@ -77,8 +77,14 @@ class ShellInsertion(object):
         return os.path.join(home(), self.rcfile)
 
     def check(self):
-        with open(self._rcfile(), 'r') as fh:
-            data = fh.read()
+        try:
+            with open(self._rcfile(), 'r') as fh:
+                data = fh.read()
+        except OSError as ose:
+            if ose.errno in (errno.ENOENT, errno.EINVAL):
+                return False
+            else:
+                raise
         return self._get_insertion() in data
 
     def install(self):
