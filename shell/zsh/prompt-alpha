@@ -1,11 +1,28 @@
 # A multiline zsh prompt.
 
+function _git_branch() {
+	GIT_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+
+	if [[ $? != 0 ]]; then
+		# Because Ubuntu (precise) is so far behind the curve, apparently, that
+		# its git's symbolic-ref doesn't yet have --short.
+		# Once I stop dealing with these systems, this entire function
+		# can be done with just the above git call.
+		GIT_BRANCH="$(git symbolic-ref HEAD 2>/dev/null)"
+		if [[ $? != 0 ]]; then
+			exit 1
+		fi
+		GIT_BRANCH="$(echo "$GIT_BRANCH" | sed -e 's_^refs/heads/__')"
+	fi
+	echo "$GIT_BRANCH"
+}
+
 function _prompt_alpha_get_location() {
 	local GIT_ROOT="`_git_root`"
 
 	if [[ -n "$GIT_ROOT" ]]; then
 		local GIT_BRANCH
-		GIT_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+		GIT_BRANCH="$(_git_branch)"
 		if [[ $? != 0 ]]; then
 			GIT_BRANCH="%B%F{red}detached head%f%b"
 		fi
