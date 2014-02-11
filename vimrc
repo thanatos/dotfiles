@@ -13,7 +13,7 @@ syntax enable
 
 
 " Colorsheme
-if has("gui")
+if has("gui_running")
 	colorscheme darkspectrum
 else
 	colorscheme delek
@@ -21,7 +21,7 @@ endif
 
 
 " GUI settings
-if has("gui")
+if has("gui_running")
 	if has("gui_win32")
 		set guifont=Consolas:h9:cANSI
 		set nocompatible
