@@ -33,3 +33,6 @@ endif
 
 " Python files use 4-space tabs.
 autocmd Filetype python setlocal expandtab
+
+" YAML files require spaces for indentation:
+autocmd Filetype yaml setlocal expandtab
