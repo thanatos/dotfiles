@@ -36,3 +36,7 @@ autocmd Filetype python setlocal expandtab
 
 " YAML files require spaces for indentation:
 autocmd Filetype yaml setlocal expandtab
+
+
+" Manpages in VIM:
+runtime ftplugin/man.vim
