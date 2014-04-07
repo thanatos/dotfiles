@@ -10,6 +10,7 @@ PAGER=less
 # Always color:
 if [[ "$(uname)" == "Darwin" ]]; then
 	export CLICOLOR=1
+	export LSCOLORS='ExGxFxdxCxDxDxhbadacec'
 else
 	alias ls="ls --color"
 fi
