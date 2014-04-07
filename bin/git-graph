@@ -1,0 +1,8 @@
+#!/bin/bash
+
+exec git log \
+	--graph \
+	--abbrev-commit \
+	--decorate \
+	--format=format:'%C(bold blue)%h%C(reset) — %C(bold white)%s%C(reset)%C(bold yellow)%d%C(reset)%n          ↳ by %C(green)%an%C(reset) on %C(cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)' \
+	--all
