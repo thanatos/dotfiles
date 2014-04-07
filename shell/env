@@ -1,5 +1,5 @@
 # Add custom tools to $PATH:
-PATH="$PATH:$HOME/Apps/bin"
+PATH="$PATH:$HOME/Apps/bin:$DOTFILES/bin"
 
 # vim is the One True Editor:
 EDITOR=vim
