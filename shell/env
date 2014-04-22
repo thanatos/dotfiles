@@ -1,11 +1,14 @@
 # Add custom tools to $PATH:
 PATH="$PATH:$HOME/Apps/bin:$DOTFILES/bin"
+export PATH
 
 # vim is the One True Editor:
 EDITOR=vim
+export EDITOR
 
 # less is more:
 PAGER=less
+export PAGER
 
 # Always color:
 if [[ "$(uname)" == "Darwin" ]]; then
