@@ -25,6 +25,8 @@ if has("gui_running")
 	if has("gui_win32")
 		set guifont=Consolas:h9:cANSI
 		set nocompatible
+	elseif has("gui_macvim")
+		set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h12
 	else
 		set guifont=Deja\ Vu\ Sans\ Mono\ 9
 	endif
