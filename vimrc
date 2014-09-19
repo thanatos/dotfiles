@@ -20,6 +20,16 @@ else
 endif
 
 
+" Visibly show where the 80th column is:
+let &colorcolumn=join(range(81,999),",")
+highlight ColorColumn ctermbg=235 guibg=#402727
+" …but don't show it on files that don't make sense:
+autocmd Filetype man setlocal colorcolumn&
+autocmd Filetype netrw setlocal colorcolumn&
+autocmd Filetype nerdtree setlocal colorcolumn&
+autocmd Filetype conque_term setlocal colorcolumn&
+
+
 " GUI settings
 if has("gui_running")
 	if has("gui_win32")
