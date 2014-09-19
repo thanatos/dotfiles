@@ -12,7 +12,7 @@ set hlsearch
 syntax enable
 
 
-" Colorsheme
+" Colorscheme
 if has("gui_running")
 	colorscheme darkspectrum
 else
