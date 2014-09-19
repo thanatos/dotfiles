@@ -52,3 +52,6 @@ autocmd Filetype yaml setlocal expandtab
 
 " Manpages in VIM:
 runtime ftplugin/man.vim
+
+" NERD tree:
+set runtimepath+=~/.vim/bundle/nerdtree
