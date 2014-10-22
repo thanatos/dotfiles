@@ -12,8 +12,17 @@ export PAGER
 
 # Always color:
 if [[ "$(uname)" == "Darwin" ]]; then
+	# OS X's `ls` doesn't use the same environment variables as GNU `ls`. These
+	# are for the OS X `ls`, and attempt to color it like GNU `ls`. (However,
+	# OS X's `ls` is not nearly as configurable.)
 	export CLICOLOR=1
 	export LSCOLORS='ExGxFxdxCxDxDxhbadacec'
+	# Check to see if GNU coreutils is install; on OS X, it'll prefix itself
+	# with a "g":
+	if which gls >/dev/null 2>&1; then
+		alias ls="gls --color"
+		eval "`gdircolors "$DOTFILES"/dir_colors`"
+	fi
 else
 	alias ls="ls --color"
 fi
