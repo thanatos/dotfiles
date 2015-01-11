@@ -28,6 +28,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
 		alias find=gfind
 	fi
 else
+	eval "`dircolors`"
 	alias ls="ls --color"
 fi
 alias grep="grep --color"
