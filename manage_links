@@ -2,6 +2,7 @@
 # coding: utf-8
 
 
+import argparse
 import errno
 import os
 import os.path
@@ -198,27 +199,26 @@ def install_link(link):
             'Installation of link “{}” aborted.\n'.format(link))
 
 
-def main(argv):
-    if len(argv) < 2:
-        list_links()
-        return
+def main():
+    parser = argparse.ArgumentParser()
+    subcommands = parser.add_subparsers(dest='command')
 
-    command = argv[1]
-    if command == 'list':
-        if len(argv) != 2:
-            util.abort_with_error('Too many arguments for command “list”.')
+    list_cmd = subcommands.add_parser('list')
+
+    install_cmd = subcommands.add_parser('install')
+    install_cmd.add_argument(
+        'name_or_number',
+        help='Either the name of the link to install, or its number in'
+        ' `manage_links list`.',
+    )
+
+    pargs = parser.parse_args()
+
+    if not pargs.command or pargs.command == 'list':
         list_links()
-    elif command == 'install':
-        if len(argv) < 3:
-            util.abort_with_error(
-                'Too few arguments for command “install”: need name or number'
-                ' of link to install.')
-        if 3 < len(argv):
-            util.abort_with_error('Too many arguments for command “install”.')
-        install_link(argv[2])
-    else:
-        util.abort_with_error('Unknown command “{}”.'.format(command))
+    elif pargs.command == 'install':
+        install_link(pargs.name_or_number)
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
