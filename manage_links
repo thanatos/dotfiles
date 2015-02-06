@@ -18,10 +18,15 @@ def dotfiles_location():
     return os.path.dirname(os.path.abspath(__file__))
 
 
-class Symlink(object):
-    def __init__(self, yaml_data):
-        self.path = yaml_data['path']
-        self.destination = yaml_data['destination']
+class BaseLink(object):
+    pass
+
+
+class Symlink(BaseLink):
+    def __init__(self, yaml_loader, yaml_data):
+        data = yaml_loader.construct_mapping(yaml_data)
+        self.path = data['path']
+        self.destination = data['destination']
 
     def check(self):
         full_path = os.path.join(home(), self.path)
@@ -63,10 +68,11 @@ source "$DOTFILES"/'{source}'
 '''
 
 
-class ShellInsertion(object):
-    def __init__(self, yaml_data):
-        self.file_to_source = yaml_data['file-to-source']
-        self.rcfile = yaml_data['file']
+class ShellInsertion(BaseLink):
+    def __init__(self, yaml_loader, yaml_data):
+        data = yaml_loader.construct_mapping(yaml_data)
+        self.file_to_source = data['file-to-source']
+        self.rcfile = data['file']
 
     def _get_insertion(self):
         dotfiles_loc = dotfiles_location()
@@ -130,18 +136,22 @@ def home():
     return os.environ['HOME']
 
 
+class _OurLoader(yaml.Loader):
+    pass
+
+
 def load_links():
     with open('links', 'r') as f:
-        data = yaml.load(f)
+        loader = _OurLoader(f)
+        loader.add_constructor('!symlink', Symlink)
+        loader.add_constructor('!shell-insertion', ShellInsertion)
+        data = loader.get_single_data()
 
-    links = {}
     for name, value in data.items():
-        link_class = link_types.get(value.get('type'))
-        if link_class is None:
-            raise IOError('Unknown link type for link “{}”.'.format(name))
-        links[name] = link_class(value)
+        if not isinstance(value, BaseLink):
+            raise ValueError('Entry "{}" wasn\'t a link.'.format(name))
 
-    return links
+    return data
 
 
 def list_links():

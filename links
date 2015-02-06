@@ -1,21 +1,21 @@
 # vim: filetype=yaml
 
 ".vimrc":
-    type: symlink
+    !symlink
     path: '.vimrc'
     destination: vimrc
 
 ".bashrc":
-    type: shell-insertion
+    !shell-insertion
     file: '.bashrc'
     file-to-source: bashrc
 
 ".zshrc":
-    type: shell-insertion
+    !shell-insertion
     file: '.zshrc'
     file-to-source: zshrc
 
 ".gitexclude":
-    type: symlink
+    !symlink
     path: '.gitexclude'
     destination: gitexclude
