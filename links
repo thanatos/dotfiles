@@ -15,6 +15,11 @@
     file: '.zshrc'
     file-to-source: zshrc
 
+".gitconfig":
+    !symlink
+    path: '.gitconfig'
+    destination: gitconfig
+
 ".gitexclude":
     !symlink
     path: '.gitexclude'
