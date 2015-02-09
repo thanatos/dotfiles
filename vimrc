@@ -50,10 +50,13 @@ autocmd Filetype python setlocal expandtab
 " YAML files require spaces for indentation:
 autocmd Filetype yaml setlocal expandtab
 
+" *.rs is Rust.
+autocmd BufEnter,BufNew *.rs setlocal filetype=rust
 
 
 " ─── Add third-party code to runtimepath ─────────────────────────────────────
 set runtimepath+=~/.vim/bundle/nerdtree
+set runtimepath+=~/.vim/bundle/rust.vim
 
 
 " ─── Misc ────────────────────────────────────────────────────────────────────
