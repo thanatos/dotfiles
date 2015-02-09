@@ -1,2 +1,9 @@
 [color]
 	ui = auto
+[user]
+	name = Roy Wellington Ⅳ
+	email = cactus_hugged@yahoo.com
+[core]
+	excludesfile = ~/.gitexclude
+[push]
+	default = simple
