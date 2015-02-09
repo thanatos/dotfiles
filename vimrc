@@ -1,3 +1,4 @@
+" ─── Basic settings ──────────────────────────────────────────────────────────
 " Line numbers
 set number
 " Tab width (4 columns, actual tabs)
@@ -12,13 +13,13 @@ set hlsearch
 syntax enable
 
 
+" ─── Color scheme ────────────────────────────────────────────────────────────
 " Colorscheme
 if has("gui_running")
 	colorscheme darkspectrum
 else
 	colorscheme delek
 endif
-
 
 " Visibly show where the 80th column is:
 let &colorcolumn=join(range(81,999),",")
@@ -28,7 +29,6 @@ autocmd Filetype man setlocal colorcolumn&
 autocmd Filetype netrw setlocal colorcolumn&
 autocmd Filetype nerdtree setlocal colorcolumn&
 autocmd Filetype conque_term setlocal colorcolumn&
-
 
 " GUI settings
 if has("gui_running")
@@ -43,6 +43,7 @@ if has("gui_running")
 endif
 
 
+" ─── autocmd ─────────────────────────────────────────────────────────────────
 " Python files use 4-space tabs.
 autocmd Filetype python setlocal expandtab
 
@@ -50,8 +51,12 @@ autocmd Filetype python setlocal expandtab
 autocmd Filetype yaml setlocal expandtab
 
 
+
+" ─── Add third-party code to runtimepath ─────────────────────────────────────
+set runtimepath+=~/.vim/bundle/nerdtree
+
+
+" ─── Misc ────────────────────────────────────────────────────────────────────
+
 " Manpages in VIM:
 runtime ftplugin/man.vim
-
-" NERD tree:
-set runtimepath+=~/.vim/bundle/nerdtree
