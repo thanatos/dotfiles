@@ -1,5 +1,37 @@
+is_directory_in_path() {
+	python -c 'import argparse, os, sys
+parser = argparse.ArgumentParser()
+parser.prog = "is_directory_in_path"
+parser.add_argument("directory")
+pargs = parser.parse_args()
+path = os.environ["PATH"].split(":")
+sys.exit(1 if pargs.directory not in path else 0)
+' "$@"
+}
+
+prepend_to_path() {
+	if ! is_directory_in_path "$1"; then
+		if [[ -z "$PATH" ]]; then
+			PATH="$1"
+		else
+			PATH="$1:$PATH"
+		fi
+	fi
+}
+append_to_path() {
+	if ! is_directory_in_path "$1"; then
+		if [[ -z "$PATH" ]]; then
+			PATH="$1"
+		else
+			PATH="$PATH:$1"
+		fi
+	fi
+}
+
 # Add custom tools to $PATH:
-PATH="$PATH:$HOME/Apps/bin:$DOTFILES/bin"
+prepend_to_path "$HOME/.local/bin"
+append_to_path "$DOTFILES/bin"
+append_to_path "$HOME/Apps/bin"
 export PATH
 
 # vim is the One True Editor:
