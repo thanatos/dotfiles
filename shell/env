@@ -64,3 +64,8 @@ else
 	alias ls="ls --color"
 fi
 alias grep="grep --color"
+
+
+# Other aliases:
+alias ll="ls -l"
+alias g="git"
