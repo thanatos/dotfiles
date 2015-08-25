@@ -20,6 +20,12 @@ function _git_branch() {
 function _prompt_alpha_get_location() {
 	local GIT_ROOT="`_git_root`"
 
+	if [[ -n "$SSH_CONNECTION" ]]; then
+		# We seem to be SSH'd somewhere; output the user & hostname.
+		printf '%%F{green}%%B%s%%b%%f%%F{green}@%%f%%F{green}%%B%s%%b%%f ' \
+			"$(id -un)" "$(hostname)"
+	fi
+
 	if [[ -n "$GIT_ROOT" ]]; then
 		local GIT_BRANCH
 		GIT_BRANCH="$(_git_branch)"
