@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+
+import io
+import os
+import subprocess as sp
+import sys
+
+
+def list_of_lines(output):
+    output = output.decode('utf-8')
+    for line in io.StringIO(output):
+        if line.endswith('\n'):
+            yield line[:-1]
+        else:
+            yield line
+
+
+def choose_remote():
+    remotes_set = set(list_of_lines(sp.check_output(('git', 'remote'))))
+    if len(remotes_set) == 0:
+        print('No remotes configured; nowhere to push.', file=sys.stderr)
+        sys.exit(1)
+    if len(remotes_set) == 1:
+        remote = remotes_set.pop()
+        print(
+            'Using remote "{}" as it is the only remote.'.format(remote),
+            file=sys.stderr,
+        )
+        return remote
+
+    remotes = sorted(remotes_set)
+    while True:
+        print(
+            'No upstream configured for this branch, and multiple remotes'
+            ' exist.'
+        )
+        for num, remote in enumerate(remotes, start=1):
+            print('{}. {}'.format(num, remote))
+        print(
+            '\x1b[1mWhich remote would you like to push to?\x1b[0m (It will'
+            ' also be configured as the upstream.) ',
+            end='',
+        )
+        sys.stdout.flush()
+        input_ = sys.stdin.readline().strip()
+        if input_ in remotes_set:
+            return input_
+        try:
+            value = int(input_)
+            if not (1 <= value <= len(remotes)):
+                raise ValueError()
+        except ValueError:
+            print('Didn\'t understand your input.', file=sys.stderr)
+            continue
+        return remotes[value - 1]
+
+
+output = \
+    sp.check_output(('git', 'rev-parse', '--abbrev-ref', '--symbolic', 'HEAD'))
+current_branch_name = output.decode('utf-8').strip()
+
+try:
+    output = sp.check_output((
+        'git', 'config',
+        '--get', 'branch.{}.remote'.format(current_branch_name)
+    ))
+    remote = output.decode('utf-8').strip()
+    do_set_upstream = False
+except sp.CalledProcessError:
+    remote = choose_remote()
+    do_set_upstream = True
+
+
+set_upstream_flag = ('--set-upstream',) if do_set_upstream else ()
+
+os.execvp(
+    'git',
+    ('git', 'push')
+    + tuple(sys.argv[1:])
+    + set_upstream_flag
+    + (remote, current_branch_name)
+)
