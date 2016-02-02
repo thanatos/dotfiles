@@ -8,6 +8,5 @@
 [push]
 	default = simple
 [alias]
-	up = "!git push --set-upstream origin \"$(git rev-parse --abbrev-ref HEAD)\""
 	co = checkout
 	zz = commit
