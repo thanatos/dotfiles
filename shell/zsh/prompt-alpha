@@ -39,7 +39,7 @@ function _prompt_alpha_get_location() {
 		fi
 		echo "%F{green}±%f %B$(basename "${GIT_ROOT}")%b:%F{green}${GIT_BRANCH}%f:%B%F{blue}/${GIT_PWD}%f%b"
 	else
-		echo '%B%F{blue}%d%f%b'
+		echo '%B%F{blue}%~%f%b'
 	fi
 }
 
