@@ -43,9 +43,17 @@ function _prompt_alpha_get_location() {
 	fi
 }
 
+function _prompt_alpha_cmd_symbol() {
+	if [[ "$UID" -eq 0 ]]; then
+		echo -n '%F{red}%B#%b%f'
+	else
+		printf '%%{\x1b[1;38;5;033m%%}»%%{\x1b[0m%%}'
+	fi
+}
+
 function _prompt_alpha() {
 	local LAST_EXIT="$?"
 	PS1='$(_prompt_alpha_get_location)
 %(?||%B%F{red}(last command returned %?.%)%f%b
-)%# '
+)$(_prompt_alpha_cmd_symbol) '
 }
