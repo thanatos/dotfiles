@@ -20,11 +20,7 @@ function _git_branch() {
 function _prompt_alpha_get_location() {
 	local GIT_ROOT="`_git_root`"
 
-	if [[ -n "$SSH_CONNECTION" ]]; then
-		# We seem to be SSH'd somewhere; output the user & hostname.
-		printf '%%F{green}%%B%s%%b%%f%%F{green}@%%f%%F{green}%%B%s%%b%%f ' \
-			"$(id -un)" "$(hostname)"
-	fi
+	_prompt_alpha_uid_and_host
 
 	if [[ -n "$GIT_ROOT" ]]; then
 		local GIT_BRANCH
@@ -42,6 +38,42 @@ function _prompt_alpha_get_location() {
 		echo '%B%F{blue}%~%f%b'
 	fi
 }
+
+
+if [[ -z "$_PROMPT_ALPHA_DEFAULT_USER" ]]; then
+	if [[ -f ~/.config/prompt_default_user ]]; then
+		export _PROMPT_ALPHA_DEFAULT_USER="$(cat ~/.config/prompt_default_user)"
+	fi
+fi
+
+
+function _prompt_alpha_uid_and_host() {
+	local output_at=0
+	local output=0
+
+	if [[ "$UID" -eq 0 ]]; then
+		echo -n '%F{red}%B%n%b%f%F{yellow}@%f'
+		output_at=1
+		output=1
+	elif [[ "$USERNAME" != "$_PROMPT_ALPHA_DEFAULT_USER" ]]; then
+		echo -n '%F{green}%B%n%b@%f'
+		output_at=1
+		output=1
+	fi
+
+	if [[ -n "$SSH_CONNECTION" ]]; then
+		if [[ $output_at -eq 0 ]]; then
+			echo -n '%F{green}@%f'
+		fi
+		echo -n '%F{green}%B%M%b%f'
+		output=1
+	fi
+
+	if [[ $output -ne 0 ]]; then
+		echo -n ' '
+	fi
+}
+
 
 function _prompt_alpha_cmd_symbol() {
 	if [[ "$UID" -eq 0 ]]; then
