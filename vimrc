@@ -53,6 +53,9 @@ autocmd Filetype yaml setlocal expandtab
 " *.rs is Rust.
 autocmd BufEnter,BufNew *.rs setlocal filetype=rust
 
+" When composing a commit message, help myself with spelling:
+autocmd FileType gitcommit setlocal spell
+
 
 " ─── Add third-party code to runtimepath ─────────────────────────────────────
 set runtimepath+=~/.vim/bundle/nerdtree
