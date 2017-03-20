@@ -56,6 +56,9 @@ autocmd BufEnter,BufNew *.rs setlocal filetype=rust
 " When composing a commit message, help myself with spelling:
 autocmd FileType gitcommit setlocal spell
 
+" Use spaces for indentation in ReST:
+autocmd FileType rst setlocal expandtab
+
 
 " ─── Add third-party code to runtimepath ─────────────────────────────────────
 set runtimepath+=~/.vim/bundle/nerdtree
