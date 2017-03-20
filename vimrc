@@ -38,7 +38,7 @@ if has("gui_running")
 	elseif has("gui_macvim")
 		set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h12
 	else
-		set guifont=Deja\ Vu\ Sans\ Mono\ 9
+		set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 9
 	endif
 endif
 
@@ -69,3 +69,8 @@ set runtimepath+=~/.vim/bundle/rust.vim
 
 " Manpages in VIM:
 runtime ftplugin/man.vim
+
+" airline works better if we always show the status:
+set laststatus=2
+" and it looks nicer if we have the patched font:
+let g:airline_powerline_fonts = 1
