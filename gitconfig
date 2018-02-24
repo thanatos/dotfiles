@@ -8,5 +8,7 @@
 [push]
 	default = simple
 [alias]
+	fp = fetch --all --prune
 	co = checkout
+	re = rebase
 	zz = commit
