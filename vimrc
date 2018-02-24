@@ -51,7 +51,7 @@ autocmd Filetype python setlocal expandtab
 autocmd Filetype yaml setlocal expandtab
 
 " *.rs is Rust.
-autocmd BufEnter,BufNew *.rs setlocal filetype=rust
+autocmd BufEnter,BufNew *.rs setlocal filetype=rust expandtab
 
 " When composing a commit message, help myself with spelling:
 autocmd FileType gitcommit setlocal spell
