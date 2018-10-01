@@ -29,6 +29,7 @@ append_to_path() {
 }
 
 # Add custom tools to $PATH:
+prepend_to_path "$HOME"/.cargo/bin
 prepend_to_path "$HOME/.local/bin"
 append_to_path "$DOTFILES/bin"
 append_to_path "$HOME/Apps/bin"
@@ -72,5 +73,9 @@ fi
 
 
 # Other aliases:
-alias ll="ls -l"
+if which exa > /dev/null; then
+	alias ll="exa -bghl"
+else
+	alias ll="ls -l"
+fi
 alias g="git"
