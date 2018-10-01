@@ -83,9 +83,32 @@ function _prompt_alpha_cmd_symbol() {
 	fi
 }
 
+
+function _prompt_alpha_set_title() {
+	local TITLE;
+	local GIT_ROOT="`_git_root`"
+	if [[ -n "$GIT_ROOT" ]]; then
+		local GIT_PWD="$(git rev-parse --show-prefix)"
+		if [[ "${GIT_PWD: -1}" == "/" ]] then
+			GIT_PWD="${GIT_PWD:0:-1}"
+		fi
+		TITLE="zsh: ±$(basename "$GIT_ROOT"):/$GIT_PWD"
+	else
+		TITLE="zsh: `pwd`"
+	fi
+	_xterm_title "$TITLE"
+}
+
+
+function _xterm_title() {
+	printf '\x1b]2;%s\x1b\\' "$1"
+}
+
+
 function _prompt_alpha() {
 	local LAST_EXIT="$?"
 	PS1='$(_prompt_alpha_get_location)
 %(?||%B%F{red}(last command returned %?.%)%f%b
 )$(_prompt_alpha_cmd_symbol) '
+	eval 'function precmd() { _prompt_alpha_set_title; }'
 }
