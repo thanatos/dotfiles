@@ -73,7 +73,7 @@ fi
 
 
 # Other aliases:
-if which exa > /dev/null; then
+if which exa >/dev/null 2>&1; then
 	alias ll="exa -bghl"
 else
 	alias ll="ls -l"
