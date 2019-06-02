@@ -45,13 +45,15 @@ endif
 
 " ─── autocmd ─────────────────────────────────────────────────────────────────
 " Python files use 4-space tabs.
-autocmd Filetype python setlocal expandtab
+autocmd Filetype python setlocal expandtab foldmethod=indent
+autocmd Filetype python normal zR
 
 " YAML files require spaces for indentation:
 autocmd Filetype yaml setlocal expandtab
 
 " *.rs is Rust.
-autocmd BufEnter,BufNew *.rs setlocal filetype=rust expandtab
+autocmd BufEnter,BufNew *.rs setlocal filetype=rust expandtab foldmethod=syntax
+autocmd BufEnter,BufNew *.rs normal zR
 
 " When composing a commit message, help myself with spelling:
 autocmd FileType gitcommit setlocal spell
