@@ -55,6 +55,9 @@ autocmd Filetype yaml setlocal expandtab
 autocmd BufEnter,BufNew *.rs setlocal filetype=rust expandtab foldmethod=syntax
 autocmd BufEnter,BufNew *.rs normal zR
 
+" *.toml is TOML
+autocmd BufEnter,BufNew *.toml setlocal filetype=toml
+
 " When composing a commit message, help myself with spelling:
 autocmd FileType gitcommit setlocal spell
 
