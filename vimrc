@@ -67,8 +67,22 @@ autocmd FileType rst setlocal expandtab
 
 
 " ─── Add third-party code to runtimepath ─────────────────────────────────────
-set runtimepath+=~/.vim/bundle/nerdtree
-set runtimepath+=~/.vim/bundle/rust.vim
+function Plugin(name)
+	"echom "Loading plugin " . a:name
+	let &runtimepath = "~/.vim/bundle/" . a:name . "," . &runtimepath
+	"let &runtimepath = &runtimepath . ",~/.vim/bundle/" . a:name
+endfunction
+command -nargs=1 Plugin call Plugin(<f-args>)
+
+function UpdatePlugin(name)
+	execute "!git -C ~/.vim/bundle/" . a:name . " fetch --depth=1"
+	execute "!git -C ~/.vim/bundle/" . a:name . " reset --hard @{u}"
+endfunction
+
+Plugin vim-airline
+Plugin nerdtree
+Plugin rust.vim
+Plugin vim-toml
 
 
 " ─── Misc ────────────────────────────────────────────────────────────────────
