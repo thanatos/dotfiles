@@ -12,3 +12,4 @@
 	co = checkout
 	re = rebase
 	zz = commit
+	s = status
