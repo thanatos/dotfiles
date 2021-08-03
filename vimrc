@@ -53,11 +53,9 @@ autocmd Filetype python normal zR
 autocmd Filetype yaml setlocal expandtab
 
 " *.rs is Rust.
-autocmd BufEnter,BufNew *.rs setlocal filetype=rust expandtab foldmethod=syntax
-autocmd BufEnter,BufNew *.rs normal zR
-
-" *.toml is TOML
-autocmd BufEnter,BufNew *.toml setlocal filetype=toml
+autocmd BufNewFile,BufRead *.rs setf rust
+autocmd Filetype rust setlocal expandtab foldmethod=syntax colorcolumn=101
+autocmd Filetype rust normal zR
 
 " When composing a commit message, help myself with spelling:
 autocmd FileType gitcommit setlocal spell
