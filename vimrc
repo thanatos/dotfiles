@@ -26,10 +26,10 @@ endif
 let &colorcolumn=81
 highlight ColorColumn ctermbg=235 guibg=#402727
 " …but don't show it on files that don't make sense:
-autocmd Filetype man setlocal colorcolumn&
-autocmd Filetype netrw setlocal colorcolumn&
-autocmd Filetype nerdtree setlocal colorcolumn&
-autocmd Filetype conque_term setlocal colorcolumn&
+autocmd FileType man setlocal colorcolumn&
+autocmd FileType netrw setlocal colorcolumn&
+autocmd FileType nerdtree setlocal colorcolumn&
+autocmd FileType conque_term setlocal colorcolumn&
 
 " GUI settings
 if has("gui_running")
@@ -46,16 +46,16 @@ endif
 
 " ─── autocmd ─────────────────────────────────────────────────────────────────
 " Python files use 4-space tabs.
-autocmd Filetype python setlocal expandtab foldmethod=indent
-autocmd Filetype python normal zR
+autocmd FileType python setlocal expandtab foldmethod=indent
+autocmd FileType python normal zR
 
 " YAML files require spaces for indentation:
-autocmd Filetype yaml setlocal expandtab
+autocmd FileType yaml setlocal expandtab
 
 " *.rs is Rust.
 autocmd BufNewFile,BufRead *.rs setf rust
-autocmd Filetype rust setlocal expandtab foldmethod=syntax colorcolumn=101
-autocmd Filetype rust normal zR
+autocmd FileType rust setlocal expandtab foldmethod=syntax colorcolumn=101
+autocmd FileType rust normal zR
 
 " When composing a commit message, help myself with spelling:
 autocmd FileType gitcommit setlocal spell
