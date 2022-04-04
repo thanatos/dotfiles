@@ -105,10 +105,76 @@ function _xterm_title() {
 }
 
 
+function _last_command_exit_status_assoc_array() {
+	declare -gA _SIGNAL_MAP
+	# We use python to dump out something we can use to build an associative
+	# array of signal numbers to names. The python program prints, on each
+	# line,
+	#     NAME NUMBER
+	python -c 'import sys
+try: sys.path.remove("")
+except ValueError: pass
+import signal
+signals = {
+        "SIGHUP": signal.SIGHUP,
+        "SIGINT": signal.SIGINT,
+        "SIGQUIT": signal.SIGQUIT,
+        "SIGILL": signal.SIGILL,
+        "SIGABRT": signal.SIGABRT,
+        "SIGFPE": signal.SIGFPE,
+        "SIGKILL": signal.SIGKILL,
+        "SIGSEGV": signal.SIGSEGV,
+        "SIGPIPE": signal.SIGPIPE,
+        "SIGALRM": signal.SIGALRM,
+        "SIGTERM": signal.SIGTERM,
+        "SIGUSR1": signal.SIGUSR1,
+        "SIGUSR2": signal.SIGUSR2,
+        "SIGCHLD": signal.SIGCHLD,
+        "SIGCONT": signal.SIGCONT,
+        "SIGSTOP": signal.SIGSTOP,
+        "SIGTSTP": signal.SIGTSTP,
+        "SIGTTIN": signal.SIGTTIN,
+        "SIGTTOU": signal.SIGTTOU,
+        "SIGBUS": signal.SIGBUS,
+        "SIGPOLL": signal.SIGPOLL,
+        "SIGPROF": signal.SIGPROF,
+        "SIGSYS": signal.SIGSYS,
+        "SIGTRAP": signal.SIGTRAP,
+        "SIGURG": signal.SIGURG,
+}
+for name, signal in signals.items(): print("{} {}".format(name, signal.value))
+' | while read -rA ITEMS; do
+		local NAME="${ITEMS[1]}"
+		local VALUE="${ITEMS[2]}"
+		_SIGNAL_MAP[$(($VALUE + 128))]="$NAME"
+	done
+}
+
+
+function _last_command_exit_status() {
+	local exit_status="$1"
+	if [[ "${+_SIGNAL_MAP}" == 0 ]]; then
+		_last_command_exit_status_assoc_array
+	fi
+	if [[ "${+_SIGNAL_MAP[$exit_status]}" == 1 ]]; then
+		local NAME="${_SIGNAL_MAP[$exit_status]}"
+		printf '%%B%%F{red}(last command got signal %s)%%f%%b\n' "$NAME"
+	else
+		printf '%%(?||%%B%%F{red}(last command returned %%?.%%)%%f%%b\n)'
+	fi
+}
+
+
 function _prompt_alpha() {
 	local LAST_EXIT="$?"
-	PS1='$(_prompt_alpha_get_location)
-%(?||%B%F{red}(last command returned %?.%)%f%b
-)$(_prompt_alpha_cmd_symbol) '
+	_prompt_alpha_get_location
+	_last_command_exit_status "$LAST_EXIT"
+	_prompt_alpha_cmd_symbol
+	printf ' '
+}
+
+
+function _prompt_alpha_setup() {
+	PS1='$(_prompt_alpha)'
 	eval 'function precmd() { _prompt_alpha_set_title; }'
 }
