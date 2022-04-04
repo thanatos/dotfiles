@@ -72,6 +72,12 @@ if [[ "$(uname)" == "Darwin" ]]; then
 fi
 
 
+# If we have zoxide, use it:
+if which zoxide >/dev/null 2>&1; then
+	eval "$(zoxide init zsh)"
+fi
+
+
 # Other aliases:
 if which exa >/dev/null 2>&1; then
 	alias ll="exa -bghl"
