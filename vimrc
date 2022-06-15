@@ -18,7 +18,7 @@ syntax enable
 if has("gui_running")
 	colorscheme darkspectrum
 else
-	colorscheme delek
+	colorscheme slate
 endif
 
 " Visibly show where the 80th column is:
