@@ -75,6 +75,25 @@ function _prompt_alpha_uid_and_host() {
 }
 
 
+# Prints an indicator of what mode we're in: vi-normal, vi-insert, or emacs.
+function _prompt_alpha_key_mode() {
+	if [[ "$KEYMAP" == "main" ]]; then
+		printf '[%%{\x1b[92m%%}i%%{\x1b[0m%%}]'
+	elif [[ "$KEYMAP" == "vicmd" ]]; then
+		printf '[%%{\x1b[93m%%}n%%{\x1b[0m%%}]'
+	else
+		printf '[? (%s)]' "$KEYMAP"
+	fi
+}
+
+function _prompt_alpha_zle_keymode_change {
+    zle reset-prompt
+}
+
+zle -N zle-line-init _prompt_alpha_zle_keymode_change
+zle -N zle-keymap-select _prompt_alpha_zle_keymode_change
+
+
 function _prompt_alpha_cmd_symbol() {
 	if [[ "$UID" -eq 0 ]]; then
 		echo -n '%F{red}%B#%b%f'
@@ -156,6 +175,8 @@ function _last_command_exit_status() {
 	if [[ "${+_SIGNAL_MAP}" == 0 ]]; then
 		_last_command_exit_status_assoc_array
 	fi
+	#printf 'SIGINT? %s ' "${_SIGNAL_MAP[130]}"
+	#printf 'stat? -->%s<-- exists? %s' "$exit_status" "${+_SIGNAL_MAP[$exit_status]}"
 	if [[ "${+_SIGNAL_MAP[$exit_status]}" == 1 ]]; then
 		local NAME="${_SIGNAL_MAP[$exit_status]}"
 		printf '%%B%%F{red}(last command got signal %s)%%f%%b\n' "$NAME"
@@ -169,6 +190,8 @@ function _prompt_alpha() {
 	local LAST_EXIT="$?"
 	_prompt_alpha_get_location
 	_last_command_exit_status "$LAST_EXIT"
+	_prompt_alpha_key_mode
+	printf ' '
 	_prompt_alpha_cmd_symbol
 	printf ' '
 }
