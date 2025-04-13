@@ -80,7 +80,6 @@ endfunction
 Plugin vim-airline
 Plugin nerdtree
 Plugin rust.vim
-Plugin vim-toml
 
 
 " ─── Misc ────────────────────────────────────────────────────────────────────
