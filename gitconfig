@@ -5,11 +5,17 @@
 	email = cactus_hugged@yahoo.com
 [core]
 	excludesfile = ~/.gitexclude
-[push]
-	default = simple
 [alias]
 	fp = fetch --all --prune
 	co = checkout
 	re = rebase
 	zz = commit
 	s = status
+
+[branch]
+	sort = committerdate
+[diff]
+	algorithm = histogram
+	colorMoved = true
+[push]
+	default = simple

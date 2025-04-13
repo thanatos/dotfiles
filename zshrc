@@ -7,8 +7,8 @@ compinit
 # As vim user, I prefer emacs mode:
 bindkey -e
 # Home, end
-bindkey -e '\eOH' beginning-of-line
-bindkey -e '\eOF' end-of-line
+bindkey -e '\e[H' beginning-of-line
+bindkey -e '\e[F' end-of-line
 # Ctrl+left/right
 bindkey -e '\e[1;5D' backward-word
 bindkey -e '\e[1;5C' forward-word
@@ -18,6 +18,32 @@ bindkey -e '\e[3~' delete-char
 autoload edit-command-line
 zle -N edit-command-line
 bindkey -e '^Xe' edit-command-line
+
+# Just kidding:
+# Ctrl+left/right
+bindkey -v '\e[1;5D' backward-word
+bindkey -a '\e[1;5D' backward-word
+bindkey -v '\e[1;5C' forward-word
+bindkey -a '\e[1;5C' forward-word
+# Home, end
+bindkey -v '\e[H' beginning-of-line
+bindkey -a '\e[H' beginning-of-line
+bindkey -v '\e[F' end-of-line
+bindkey -a '\e[F' end-of-line
+# But bind some of the emacs keys when in insert mode
+bindkey -v '^A' beginning-of-line
+bindkey -v '^E' end-of-line
+bindkey -v '^W' backward-kill-word
+bindkey -v '^K' kill-line
+bindkey -v '^V' quoted-insert
+bindkey -v '^Xe' edit-command-line
+bindkey -a '^Xe' edit-command-line
+# By default, zle uses the literal-vi backspace behavior. `vim` hasn't
+# done this in eons.
+bindkey -v '^H' backward-delete-char
+bindkey -a '^H' backward-delete-char
+bindkey -v '^?' backward-delete-char
+bindkey -a '^?' backward-delete-char
 
 
 # History settings:

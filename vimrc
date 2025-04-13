@@ -12,6 +12,8 @@ set hlsearch
 " Syntax highlighting
 syntax enable
 
+filetype plugin on
+
 
 " ─── Color scheme ────────────────────────────────────────────────────────────
 " Colorscheme
@@ -39,7 +41,7 @@ if has("gui_running")
 	elseif has("gui_macvim")
 		set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h12
 	else
-		set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 9
+		set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 12
 	endif
 endif
 
@@ -77,9 +79,22 @@ function UpdatePlugin(name)
 	execute "!git -C ~/.vim/bundle/" . a:name . " reset --hard @{u}"
 endfunction
 
-Plugin vim-airline
-Plugin nerdtree
-Plugin rust.vim
+function InitPlugs()
+	if !isdirectory($HOME . "/.vim")
+		execute "mkdir! " . escape($HOME . "/.vim", ' \')
+	endif
+	if !isdirectory($HOME . "/.vim/vim-plug")
+		execute "!git -C ~/.vim clone --depth=1 https://github.com/junegunn/vim-plug.git"
+	endif
+endfunction
+
+"Plugin vim-airline
+"Plugin nerdtree
+"Plugin rust.vim
+"Plugin diffchar.vim
+Plugin vim-conque
+Plugin Vim-Jinja2-Syntax
+Plugin rainbow_parentheses.vim
 
 
 " ─── Misc ────────────────────────────────────────────────────────────────────
@@ -91,3 +106,5 @@ runtime ftplugin/man.vim
 set laststatus=2
 " and it looks nicer if we have the patched font:
 let g:airline_powerline_fonts = 1
+
+set spellfile=~/.vim/roy-spell/spell.utf-8.add

@@ -58,6 +58,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
 	fi
 else
 	eval "`dircolors`"
+	LS_COLORS="$(printf '%s\n' "$LS_COLORS" | python3 $DOTFILES/fix_ls_colors.py)"
 	alias ls="ls --color"
 fi
 alias grep="grep --color"
