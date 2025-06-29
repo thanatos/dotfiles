@@ -3,8 +3,6 @@ use std::ops::DerefMut;
 use std::ptr::null_mut;
 use std::sync::Mutex;
 
-use once_cell::sync::Lazy;
-
 mod git;
 mod prompt;
 mod zsh;
@@ -45,25 +43,74 @@ impl OurModuleData {
         let mut builtins_table = Vec::new();
 
         let mut strings = Strings::new();
-        let builtin_name = strings.add(c"_rust-prompt-alpha");
-
-        builtins_table.push(zsh::Builtin {
-            node: zsh::HashNode {
-                next: null_mut(),
-                nam: builtin_name,
-                flags: 0,
-            },
-            handlerfunc: Some(rust_prompt),
-            minargs: 0,
-            maxargs: -1,
-            funcid: 0,
-            optstr: null_mut(),
-            defopts: null_mut(),
-        });
+        {
+            let builtin_name = strings.add(c"_rust-prompt-alpha");
+            builtins_table.push(zsh::Builtin {
+                node: zsh::HashNode {
+                    next: null_mut(),
+                    nam: builtin_name,
+                    flags: 0,
+                },
+                handlerfunc: Some(rust_prompt),
+                minargs: 0,
+                maxargs: -1,
+                funcid: 0,
+                optstr: null_mut(),
+                defopts: null_mut(),
+            });
+        }
+        {
+            let builtin_name = strings.add(c"_rust-prompt-alpha_pre-exec");
+            builtins_table.push(zsh::Builtin {
+                node: zsh::HashNode {
+                    next: null_mut(),
+                    nam: builtin_name,
+                    flags: 0,
+                },
+                handlerfunc: Some(rust_prompt_pre_exec),
+                minargs: 0,
+                maxargs: -1,
+                funcid: 0,
+                optstr: null_mut(),
+                defopts: null_mut(),
+            });
+        }
+        {
+            let builtin_name = strings.add(c"_rust-prompt-alpha_pre-cmd");
+            builtins_table.push(zsh::Builtin {
+                node: zsh::HashNode {
+                    next: null_mut(),
+                    nam: builtin_name,
+                    flags: 0,
+                },
+                handlerfunc: Some(rust_prompt_pre_cmd),
+                minargs: 0,
+                maxargs: -1,
+                funcid: 0,
+                optstr: null_mut(),
+                defopts: null_mut(),
+            });
+        }
+        {
+            let builtin_name = strings.add(c"_rust-prompt-alpha_set-timing-threshold");
+            builtins_table.push(zsh::Builtin {
+                node: zsh::HashNode {
+                    next: null_mut(),
+                    nam: builtin_name,
+                    flags: 0,
+                },
+                handlerfunc: Some(rust_prompt_set_timing_threshold),
+                minargs: 0,
+                maxargs: -1,
+                funcid: 0,
+                optstr: null_mut(),
+                defopts: null_mut(),
+            });
+        }
 
         let features = zsh::Features {
             bn_list: builtins_table.as_mut_ptr(),
-            bn_size: 1,
+            bn_size: i32::try_from(builtins_table.len()).unwrap(),
             cd_list: null_mut(),
             cd_size: 0,
             mf_list: null_mut(),
@@ -87,17 +134,16 @@ impl OurModuleData {
 
 unsafe impl Send for OurModuleData {}
 
-unsafe extern "C" fn rust_prompt(
+unsafe extern "C" fn zsh_fn_thunk(
     _builtin_name: *mut libc::c_char,
     args: *mut *mut libc::c_char,
     opts: *mut zsh::Options,
     q: libc::c_int,
+    f: impl Fn(&[&CStr]) -> Result<(), i32> + std::panic::RefUnwindSafe,
 ) -> libc::c_int {
     let _ = (opts, q);
     let args_v = unsafe { args_array_to_vec(&args) };
-    let result = std::panic::catch_unwind(|| {
-        prompt::prompt(&args_v)
-    });
+    let result = std::panic::catch_unwind(|| f(&args_v));
     match result {
         Ok(Ok(())) => 0,
         Ok(Err(err)) => err,
@@ -106,6 +152,52 @@ unsafe extern "C" fn rust_prompt(
             -42
         }
     }
+}
+
+unsafe extern "C" fn rust_prompt(
+    builtin_name: *mut libc::c_char,
+    args: *mut *mut libc::c_char,
+    opts: *mut zsh::Options,
+    q: libc::c_int,
+) -> libc::c_int {
+    unsafe { zsh_fn_thunk(builtin_name, args, opts, q, prompt::prompt) }
+}
+
+unsafe extern "C" fn rust_prompt_pre_exec(
+    builtin_name: *mut libc::c_char,
+    args: *mut *mut libc::c_char,
+    opts: *mut zsh::Options,
+    q: libc::c_int,
+) -> libc::c_int {
+    unsafe {
+        zsh_fn_thunk(builtin_name, args, opts, q, |_| {
+            prompt::pre_exec();
+            Ok(())
+        })
+    }
+}
+
+unsafe extern "C" fn rust_prompt_pre_cmd(
+    builtin_name: *mut libc::c_char,
+    args: *mut *mut libc::c_char,
+    opts: *mut zsh::Options,
+    q: libc::c_int,
+) -> libc::c_int {
+    unsafe {
+        zsh_fn_thunk(builtin_name, args, opts, q, |_| {
+            prompt::pre_cmd();
+            Ok(())
+        })
+    }
+}
+
+unsafe extern "C" fn rust_prompt_set_timing_threshold(
+    builtin_name: *mut libc::c_char,
+    args: *mut *mut libc::c_char,
+    opts: *mut zsh::Options,
+    q: libc::c_int,
+) -> libc::c_int {
+    unsafe { zsh_fn_thunk(builtin_name, args, opts, q, prompt::set_timing_threshold) }
 }
 
 unsafe fn args_array_to_vec<'a>(args: &'a *mut *mut libc::c_char) -> Vec<&'a CStr> {
@@ -123,7 +215,7 @@ unsafe fn args_array_to_vec<'a>(args: &'a *mut *mut libc::c_char) -> Vec<&'a CSt
     args_vec
 }
 
-static MODULE_DATA: Lazy<Mutex<Option<Box<OurModuleData>>>> = Lazy::new(|| Mutex::new(None));
+static MODULE_DATA: Mutex<Option<Box<OurModuleData>>> = Mutex::new(None);
 
 #[unsafe(no_mangle)]
 fn setup_(_m: *mut zsh::Module) -> libc::c_int {

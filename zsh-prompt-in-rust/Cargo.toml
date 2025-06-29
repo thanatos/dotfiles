@@ -10,7 +10,6 @@ crate-type = ["cdylib", "lib"]
 anyhow = "1.0.97"
 libc = "0.2.171"
 nix = {version = "0.29.0", features = ["signal", "user"]}
-once_cell = "1.21.3"
 smallvec = "1.15.0"
 
 [profile.release]

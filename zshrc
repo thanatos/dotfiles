@@ -52,4 +52,6 @@ if [[ "${ZSH_NO_RUST_PROMPT-}" != "" ]]; then
 else
 	module_path="$DOTFILES/zsh-prompt-in-rust/target/debug" zmodload libzsh_prompt_in_rust
 	PS1='$(_rust-prompt-alpha "$?" "royiv" "vi")'
+	eval 'preexec() { _rust-prompt-alpha_pre-exec }'
+	eval 'precmd() { _rust-prompt-alpha_pre-cmd }'
 fi
