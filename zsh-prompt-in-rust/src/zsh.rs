@@ -36,12 +36,7 @@ pub struct Builtin {
 }
 
 type HandlerFunc = Option<
-    unsafe extern "C" fn(
-        *mut c_char,
-        *mut *mut c_char,
-        *mut Options,
-        libc::c_int,
-    ) -> libc::c_int,
+    unsafe extern "C" fn(*mut c_char, *mut *mut c_char, *mut Options, libc::c_int) -> libc::c_int,
 >;
 
 #[repr(C)]
@@ -76,17 +71,9 @@ pub struct HashNode {
 extern "C" {
     pub fn featuresarray(m: *mut Module, f: *mut Features) -> *mut *mut c_char;
 
-    pub fn handlefeatures(
-        m: *mut Module,
-        f: *mut Features,
-        enables: *mut *mut c_int,
-    ) -> c_int;
+    pub fn handlefeatures(m: *mut Module, f: *mut Features, enables: *mut *mut c_int) -> c_int;
 
-    pub fn setfeatureenables(
-        m: *mut Module,
-        f: *mut Features,
-        e: *mut libc::c_int,
-    ) -> c_int;
+    pub fn setfeatureenables(m: *mut Module, f: *mut Features, e: *mut libc::c_int) -> c_int;
 
     pub fn getsparam(s: *mut c_char) -> *mut c_char;
 }

@@ -148,10 +148,7 @@ fn get_uid_and_host(default_username: &CStr) -> UidAndHost {
     let ssh_connection = unsafe { crate::zsh::get_string_param(c"SSH_CONNECTION") };
     let via_ssh = ssh_connection.is_some();
 
-    UidAndHost {
-        uid,
-        via_ssh,
-    }
+    UidAndHost { uid, via_ssh }
 }
 
 struct UidAndHost {
@@ -251,7 +248,11 @@ enum Location {
 impl fmt::Display for Location {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Location::Git { repo, branch, prefix } => {
+            Location::Git {
+                repo,
+                branch,
+                prefix,
+            } => {
                 write!(f, "%F{{green}}±%f %B{repo}%b:{branch}:")?;
                 match prefix {
                     Ok(p) => {
