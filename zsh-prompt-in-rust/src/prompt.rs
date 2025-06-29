@@ -6,11 +6,13 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
+use chrono::{DateTime, Local};
 use nix::sys::signal::Signal;
 
 struct TimingInfo {
     last_start: Option<Instant>,
     last_duration: Option<Duration>,
+    last_end_dt: Option<DateTime<Local>>,
 }
 
 impl TimingInfo {
@@ -18,6 +20,7 @@ impl TimingInfo {
         TimingInfo {
             last_start: None,
             last_duration: None,
+            last_end_dt: None,
         }
     }
 }
@@ -26,11 +29,14 @@ static TIMING_INFO: Mutex<TimingInfo> = Mutex::new(TimingInfo::new());
 static TIMING_THRESHOLD_MS: Mutex<u32> = Mutex::new(500);
 
 pub fn pre_exec() {
-    TIMING_INFO.lock().unwrap().last_start = Some(Instant::now());
+    let now = Instant::now();
+    let mut lock = TIMING_INFO.lock().unwrap();
+    lock.last_start = Some(now);
 }
 
 pub fn pre_cmd() {
     let end = Instant::now();
+    let end_dt = Local::now();
     let mut lock = TIMING_INFO.lock().unwrap();
 
     if let Some(start) = lock.last_start.take() {
@@ -40,6 +46,7 @@ pub fn pre_cmd() {
         lock.last_duration = None;
     }
     lock.last_start = None;
+    lock.last_end_dt = Some(end_dt);
 }
 
 pub fn set_timing_threshold(args: &[&CStr]) -> Result<(), i32> {
@@ -76,10 +83,14 @@ pub fn prompt(args: &[&CStr]) -> Result<(), i32> {
     let uid_and_host = get_uid_and_host(args.default_username);
     let location = get_location();
     let last_cmd_timing = LastCommandTiming::get();
-    let last_exit_status = last_command_exit_status(args.last_exit_status);
+    let last_exit_status = LastCommandExitStatus::from_exit_status(args.last_exit_status);
+    let last_exit = LastCommandExit {
+        status: last_exit_status,
+        end_dt: TIMING_INFO.lock().unwrap().last_end_dt,
+    };
     let key_mode_t = key_mode(args.vi_mode);
     let cmd_sym = cmd_symbol();
-    print!("{uid_and_host}{location}\n{last_cmd_timing}{last_exit_status}{key_mode_t}{cmd_sym} ");
+    print!("{uid_and_host}{location}\n{last_cmd_timing}{last_exit}{key_mode_t}{cmd_sym} ");
     io::stdout().flush().unwrap();
     Ok(())
 }
@@ -306,36 +317,66 @@ impl fmt::Display for KeyMode {
     }
 }
 
-fn last_command_exit_status(exit_status: i32) -> LastCommandExit {
-    if exit_status == 0 {
-        return LastCommandExit::Success;
-    } else if 128 <= exit_status {
-        if let Ok(sig) = Signal::try_from(exit_status - 128) {
-            return LastCommandExit::Signal(sig);
-        }
-    }
-
-    LastCommandExit::Error
-}
-
-enum LastCommandExit {
+enum LastCommandExitStatus {
     Success,
     Error,
     Signal(Signal),
 }
 
+impl LastCommandExitStatus {
+    fn from_exit_status(exit_status: i32) -> LastCommandExitStatus {
+        if exit_status == 0 {
+            return LastCommandExitStatus::Success;
+        } else if 128 <= exit_status {
+            if let Ok(sig) = Signal::try_from(exit_status - 128) {
+                return LastCommandExitStatus::Signal(sig);
+            }
+        }
+
+        LastCommandExitStatus::Error
+    }
+}
+
+struct LastCommandExit {
+    status: LastCommandExitStatus,
+    end_dt: Option<DateTime<Local>>,
+}
+
 impl fmt::Display for LastCommandExit {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            LastCommandExit::Success => Ok(()),
-            LastCommandExit::Error => write!(f, "%B%F{{red}}(last command returned %?.%)%f%b\n"),
-            LastCommandExit::Signal(signal) => {
+        match self.status {
+            LastCommandExitStatus::Success => Ok(()),
+            LastCommandExitStatus::Error => {
                 write!(
                     f,
-                    "%B%F{{red}}(last command got signal {})%f%b\n",
-                    signal.as_str()
+                    "%F{{red}}%B(last command returned %?{}%)%b%f\n",
+                    LastCommandEnd(self.end_dt.as_ref()),
                 )
             }
+            LastCommandExitStatus::Signal(signal) => {
+                write!(
+                    f,
+                    "%F{{red}}%B(last command got signal {}{})%b%f\n",
+                    signal.as_str(),
+                    LastCommandEnd(self.end_dt.as_ref()),
+                )
+            }
+        }
+    }
+}
+
+struct LastCommandEnd<'a>(Option<&'a DateTime<Local>>);
+
+impl fmt::Display for LastCommandEnd<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(dt) = self.0 {
+            write!(
+                f,
+                "%b; failed at {}%B",
+                dt.to_rfc3339_opts(chrono::format::SecondsFormat::Secs, true),
+            )
+        } else {
+            Ok(())
         }
     }
 }
