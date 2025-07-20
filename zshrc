@@ -47,4 +47,9 @@ function _prompt_bash_like() {
 	PS1="%B%F{green}%n@%m%f %F{blue%~ %#%f%b "
 }
 
-_prompt_alpha
+if [[ "${ZSH_NO_RUST_PROMPT-}" != "" ]]; then
+	_prompt_alpha_setup
+else
+	module_path="$DOTFILES/zsh-prompt-in-rust/target/debug" zmodload libzsh_prompt_in_rust
+	PS1='$(_rust-prompt-alpha "$?" "royiv" "vi")'
+fi
