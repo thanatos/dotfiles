@@ -6,8 +6,7 @@ use std::process::{Command, Stdio};
 
 pub fn show_toplevel() -> Option<PathBuf> {
     let mut cmd = Command::new("git");
-    cmd
-        .arg("rev-parse")
+    cmd.arg("rev-parse")
         .arg("--show-toplevel")
         .stderr(Stdio::null())
         .stdout(Stdio::piped());
@@ -32,14 +31,11 @@ pub fn show_toplevel() -> Option<PathBuf> {
 
 pub fn show_prefix() -> anyhow::Result<PathBuf> {
     let mut cmd = Command::new("git");
-    cmd
-        .arg("rev-parse")
+    cmd.arg("rev-parse")
         .arg("--show-prefix")
         .stderr(Stdio::null())
         .stdout(Stdio::piped());
-    let output = cmd
-        .spawn()?
-        .wait_with_output()?;
+    let output = cmd.spawn()?.wait_with_output()?;
     if !output.status.success() {
         anyhow::bail!("git rev-parse --show-prefix failed");
     }
