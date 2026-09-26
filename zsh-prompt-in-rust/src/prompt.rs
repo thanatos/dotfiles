@@ -290,6 +290,9 @@ fn key_mode(vi_mode: bool) -> KeyMode {
         }
     } else if keymap == Some(c"vicmd") {
         KeyMode::Normal
+    } else if keymap.is_none() {
+        // Interpret $KEYMAP being unset as emacs mode. Empiracally, this seems to be what happens.
+        KeyMode::Emacs
     } else {
         let as_string = match keymap {
             Some(v) => v.to_string_lossy().into_owned(),
