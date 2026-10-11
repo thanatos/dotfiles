@@ -91,3 +91,6 @@ runtime ftplugin/man.vim
 set laststatus=2
 " and it looks nicer if we have the patched font:
 let g:airline_powerline_fonts = 1
+
+highlight CocInlayHint NONE
+highlight CocInlayHint guifg=#555555 ctermfg=241
