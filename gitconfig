@@ -12,5 +12,7 @@
 	zz = commit
 	s = status
 
+[init]
+	defaultBranch = main
 [push]
 	default = simple
