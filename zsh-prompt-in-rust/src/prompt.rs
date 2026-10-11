@@ -400,7 +400,9 @@ impl fmt::Display for LastCommandTiming {
         if let Some(duration) = self.elapsed.as_ref() {
             let threshold = *TIMING_THRESHOLD_MS.lock().unwrap();
             if u128::from(threshold) <= duration.as_millis() {
-                write!(f, "⏱{}\n", ElapsedTimePretty(duration))
+                // U+23F1 is a stopwatch.
+                // U+FE0F is variant selector 16, which for emoji is "emoji presentation".
+                write!(f, "\u{23f1}\u{fe0f} {}\n", ElapsedTimePretty(duration))
             } else {
                 Ok(())
             }
