@@ -29,7 +29,9 @@ highlight ColorColumn ctermbg=235 guibg=#402727
 autocmd FileType man setlocal colorcolumn&
 autocmd FileType netrw setlocal colorcolumn&
 autocmd FileType nerdtree setlocal colorcolumn&
-autocmd FileType conque_term setlocal colorcolumn&
+
+autocmd TerminalWinOpen * setlocal nonumber
+autocmd TerminalWinOpen * setlocal colorcolumn&
 
 " GUI settings
 if has("gui_running")
